@@ -6,7 +6,7 @@ import {
   createLovableAiGatewayProvider,
   getLovableApiKey,
 } from "@/lib/ai-gateway.server";
-import { resolveCompanyBySenderWhatsapp } from "@/lib/webhook-auth.server";
+import { resolveCompanyBySenderWhatsapp, resolveCatchallCompany } from "@/lib/webhook-auth.server";
 import { autoVerifyReimbursementNfe } from "@/lib/nfe-verify.server";
 
 /**
@@ -387,14 +387,18 @@ export const Route = createFileRoute("/api/public/evolution")({
           const sender = phoneFromJid(key?.remoteJid);
           const senderName: string | null = data?.pushName ?? null;
 
-          // Resolve a empresa SOMENTE pelo COLABORADOR que enviou (WhatsApp
-          // cadastrado em profiles.whatsapp). Sem token e sem fallbacks.
-          const companyId = await resolveCompanyBySenderWhatsapp(sender);
+          // Resolve a empresa pelo COLABORADOR que enviou (WhatsApp cadastrado
+          // em profiles.whatsapp). Se o número NÃO estiver cadastrado, cai na
+          // empresa padrão (catch-all) definida em companies.is_catchall_default.
+          let companyId = await resolveCompanyBySenderWhatsapp(sender);
+          if (!companyId) {
+            companyId = await resolveCatchallCompany();
+          }
           if (!companyId) {
             await logUnresolved(evt, sender, ownerNumber, key?.remoteJid ?? null);
             results.push({
               status: "ignorado",
-              reason: "colaborador (whatsapp) não cadastrado em nenhuma empresa",
+              reason: "sem empresa padrão configurada e remetente não cadastrado",
             });
             continue;
           }
