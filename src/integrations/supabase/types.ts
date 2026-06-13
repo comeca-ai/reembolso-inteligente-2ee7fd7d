@@ -22,6 +22,7 @@ export type Database = {
           created_at: string
           evolution_instance: string | null
           id: string
+          is_catchall_default: boolean
           politica_reembolso_arquivo: string | null
           razao_social: string
           updated_at: string
@@ -35,6 +36,7 @@ export type Database = {
           created_at?: string
           evolution_instance?: string | null
           id?: string
+          is_catchall_default?: boolean
           politica_reembolso_arquivo?: string | null
           razao_social: string
           updated_at?: string
@@ -48,6 +50,7 @@ export type Database = {
           created_at?: string
           evolution_instance?: string | null
           id?: string
+          is_catchall_default?: boolean
           politica_reembolso_arquivo?: string | null
           razao_social?: string
           updated_at?: string
@@ -546,6 +549,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      resolve_catchall_company: { Args: never; Returns: string }
       resolve_company_by_instance: {
         Args: { _instance: string }
         Returns: string
