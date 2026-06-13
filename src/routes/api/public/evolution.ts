@@ -6,7 +6,7 @@ import {
   createLovableAiGatewayProvider,
   getLovableApiKey,
 } from "@/lib/ai-gateway.server";
-import { resolveCompanyBySenderWhatsapp } from "@/lib/webhook-auth.server";
+import { resolveCompanyBySenderWhatsapp, resolveCatchallCompany } from "@/lib/webhook-auth.server";
 import { autoVerifyReimbursementNfe } from "@/lib/nfe-verify.server";
 
 /**
