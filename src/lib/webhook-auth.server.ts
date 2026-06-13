@@ -126,6 +126,21 @@ export async function resolveCompanyBySenderWhatsapp(
 }
 
 /**
+ * Empresa padrão (catch-all): para onde vão os comprovantes vindos de números
+ * de WhatsApp que NÃO estão cadastrados em nenhuma empresa. Definida pela flag
+ * companies.is_catchall_default. Retorna null se nenhuma empresa estiver
+ * marcada como padrão.
+ */
+export async function resolveCatchallCompany(): Promise<string | null> {
+  const { data, error } = await supabaseAdmin.rpc("resolve_catchall_company");
+  if (error) {
+    console.error("[webhook-auth] resolve_catchall_company falhou:", error);
+    return null;
+  }
+  return (data as string | null) ?? null;
+}
+
+/**
  * Verifica se o WhatsApp informado já está cadastrado para um colaborador de
  * OUTRA empresa. Como a empresa é resolvida pelo remetente, o mesmo número em
  * duas empresas tornaria o roteamento ambíguo (a despesa poderia ir para a
