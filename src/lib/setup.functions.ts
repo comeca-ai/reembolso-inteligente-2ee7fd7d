@@ -9,7 +9,12 @@ export const getSetupProgress = createServerFn({ method: 'POST' })
     if (error || !profile?.company_id) throw new Error('Empresa não encontrada.');
     const { data, error: readError } = await context.supabase.from('company_setup_progress').select('step').eq('company_id', profile.company_id).maybeSingle();
     if (readError) throw new Error('Não foi possível carregar a configuração.');
-    return { step: z.enum(['policy', 'participants', 'completed']).parse(data?.step ?? 'policy') };
+    if (!data) {
+      const { data: policy, error: policyError } = await context.supabase.from('policies').select('id').eq('company_id', profile.company_id).eq('active', true).limit(1);
+      if (policyError) throw new Error('Não foi possível verificar a política vigente.');
+      return { step: policy?.length ? 'participants' as const : 'policy' as const };
+    }
+    return { step: z.enum(['policy', 'participants', 'completed']).parse(data.step) };
   });
 
 export const saveSetupProgress = createServerFn({ method: 'POST' })
