@@ -12,6 +12,7 @@ import { landingForRole } from "@/lib/permissions";
 
 export const Route = createFileRoute("/login")({
   ssr: false,
+  head: () => ({ meta: [{ title: "Entrar · reembolsa aí" }, { name: "description", content: "Acesse sua conta de reembolso corporativo com e-mail e senha." }, { property: "og:title", content: "Entrar · reembolsa aí" }, { property: "og:description", content: "Acesso seguro à sua operação de reembolso corporativo." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   beforeLoad: async () => {
     if (await isAuthenticated()) {
       throw redirect({ to: "/overview" });
@@ -88,7 +89,7 @@ function LoginPage() {
     <AuthLayout
       eyebrow="Acesso ao painel"
       title="Entrar na sua conta"
-      subtitle="Acompanhe os reembolsos da sua equipe de campo em um só lugar."
+      subtitle="Acompanhe os reembolsos da sua operação em um só lugar."
     >
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         <div className="space-y-2">

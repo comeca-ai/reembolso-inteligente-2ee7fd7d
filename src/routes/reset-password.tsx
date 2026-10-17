@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/reset-password")({
   ssr: false,
+  head: () => ({ meta: [{ title: "Nova senha · reembolsa aí" }, { name: "description", content: "Crie uma nova senha para acessar o reembolsa aí." }, { property: "og:title", content: "Nova senha · reembolsa aí" }, { property: "og:description", content: "Crie uma nova senha para acessar o reembolsa aí." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: ResetPasswordPage,
 });
 

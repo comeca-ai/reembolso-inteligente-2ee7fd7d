@@ -61,7 +61,7 @@ const CHART_COLORS = [
 ];
 
 export const Route = createFileRoute("/_app/reports")({
-  head: () => ({ meta: [{ title: "Relatórios · reembolso.ia.br" }] }),
+  head: () => ({ meta: [{ title: "Relatórios · reembolsa aí" }, { name: "description", content: "Relatórios financeiros da operação de reembolso corporativo." }, { property: "og:title", content: "Relatórios · reembolsa aí" }, { property: "og:description", content: "Relatórios financeiros da operação de reembolso corporativo." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   beforeLoad: () => {
     const role = getCurrentUser()?.role;
     if (!canAccess("/reports", role)) {

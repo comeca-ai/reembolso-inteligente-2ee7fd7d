@@ -170,9 +170,11 @@ Fluxo principal de captura:
 ### 5.1 Onboarding / autenticação
 - **`/` (index)** — landing "Configure a solução".
 - **`/signup`** — fluxo de setup: cadastro → participantes → política → `/onboarding`.
+- **`/signup`** — cadastro da empresa e administrador → `/onboarding`: política em PDF real → participantes → aplicação. Etapa pendente armazenada em `company_setup_progress`, com acesso exclusivo do admin da empresa. A confirmação de e-mail retorna ao onboarding; login comum permanece direto ao app.
 - **`/login`** — **somente e-mail e senha**. Após login, vai direto ao app
   (`landingForRole`); o envio da política **não** trava o acesso — é etapa do setup.
 - **`/onboarding`** — conclui a configuração (participantes/política).
+- **`/onboarding`** — usa `PolicyUploadStep` para transmitir o PDF completo a `uploadAndExtractPolicy` e só anunciar ativação após extração bem-sucedida; aceita PDF até 10 MB. `ParticipantsStep` apresenta resultados individuais e não repete convites bem-sucedidos na mesma sessão. Reabrir a configuração retoma a etapa persistida, mas a planilha não é armazenada.
 - **`/reset-password`** e troca obrigatória de senha (`ForcePasswordChangeDialog`) para convidados.
 - **`/pre-cadastro`** — captação inicial.
 

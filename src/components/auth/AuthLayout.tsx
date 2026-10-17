@@ -34,7 +34,7 @@ export function AuthLayout({
 
         <div className="relative space-y-6">
           <h2 className="max-w-sm text-2xl font-semibold leading-snug text-sidebar-foreground">
-            Reembolsos de equipes de campo no automático, com decisão humana.
+            Reembolso corporativo para grandes operações, com decisão humana.
           </h2>
           <ul className="space-y-3.5 text-sm text-sidebar-foreground/80">
             <li className="flex items-start gap-3">

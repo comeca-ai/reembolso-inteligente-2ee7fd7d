@@ -44,9 +44,7 @@ const overviewQuery = queryOptions({
 });
 
 export const Route = createFileRoute("/_app/overview")({
-  head: () => ({
-    meta: [{ title: "Visão geral · reembolso.ia.br" }],
-  }),
+  head: () => ({ meta: [{ title: "Visão geral · reembolsa aí" }, { name: "description", content: "Indicadores financeiros e acompanhamento da operação de reembolsos." }, { property: "og:title", content: "Visão geral · reembolsa aí" }, { property: "og:description", content: "Indicadores financeiros e acompanhamento da operação de reembolsos." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   beforeLoad: () => {
     const role = getCurrentUser()?.role;
     if (!canAccess("/overview", role)) {

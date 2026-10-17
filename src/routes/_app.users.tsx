@@ -51,7 +51,7 @@ const fieldUsersQuery = queryOptions({ queryKey: ["field-users"], queryFn: () =>
 const approversQuery = queryOptions({ queryKey: ["approvers"], queryFn: () => api.listApprovers() });
 
 export const Route = createFileRoute("/_app/users")({
-  head: () => ({ meta: [{ title: "Cadastros · reembolso.ia.br" }] }),
+  head: () => ({ meta: [{ title: "Cadastros · reembolsa aí" }, { name: "description", content: "Gerencie colaboradores e aprovadores da sua empresa." }, { property: "og:title", content: "Cadastros · reembolsa aí" }, { property: "og:description", content: "Gerencie colaboradores e aprovadores da sua empresa." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   beforeLoad: () => {
     const role = getCurrentUser()?.role;
     if (!canAccess("/users", role)) {

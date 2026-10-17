@@ -278,6 +278,10 @@ export const uploadAndExtractPolicy = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const bytes = Buffer.from(data.fileBase64, "base64");
+    if (!data.fileName.toLowerCase().endsWith('.pdf') || bytes.subarray(0, 5).toString() !== '%PDF-') {
+      throw new Error('Envie um documento PDF válido.');
+    }
+    if (bytes.length > 10 * 1024 * 1024) throw new Error('O arquivo deve ter no máximo 10 MB.');
     const sizeKb = Math.max(1, Math.round(bytes.length / 1024));
 
     const policyId = crypto.randomUUID();
@@ -370,14 +374,18 @@ export const uploadAndExtractPolicy = createServerFn({ method: "POST" })
     }
 
     // Ativa a nova versão e desativa as demais.
-    await supabaseAdmin
+    const { error: deactivateError } = await supabaseAdmin
       .from("policies")
       .update({ active: false })
       .eq("company_id", companyId);
-    await supabaseAdmin
+    if (deactivateError) throw new Error('Não foi possível atualizar a política vigente.');
+    const { error: activateError } = await supabaseAdmin
       .from("policies")
       .update({ active: true, status: "ativa", pages: extracted.pages })
       .eq("id", policyId);
+    if (activateError) throw new Error('Não foi possível ativar a política.');
+    const { error: companyError } = await supabaseAdmin.from('companies').update({ politica_reembolso_arquivo: data.fileName }).eq('id', companyId);
+    if (companyError) throw new Error('Não foi possível registrar a política na empresa.');
 
     return { ok: true, policyId, rulesCount: extracted.rules.length };
   });

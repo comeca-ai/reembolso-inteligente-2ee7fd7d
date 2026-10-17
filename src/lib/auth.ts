@@ -290,7 +290,7 @@ export async function signUpCompany(
     email: input.email.trim().toLowerCase(),
     password: input.senha,
     options: {
-      emailRedirectTo: `${window.location.origin}/overview`,
+      emailRedirectTo: `${window.location.origin}/onboarding`,
       data: {
         razao_social: input.razaoSocial.trim(),
         cnpj: input.cnpj.trim(),
