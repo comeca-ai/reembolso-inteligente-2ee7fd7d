@@ -122,7 +122,7 @@ async function fetchDespesas(): Promise<RichDespesa[]> {
 }
 
 export const Route = createFileRoute("/_app/expenses/")({
-  head: () => ({ meta: [{ title: "Despesas · reembolso.ia.br" }] }),
+  head: () => ({ meta: [{ title: "Despesas · reembolsa aí" }, { name: "description", content: "Consulte despesas e comprovantes da sua operação corporativa." }, { property: "og:title", content: "Despesas · reembolsa aí" }, { property: "og:description", content: "Consulte despesas e comprovantes da sua operação corporativa." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   pendingComponent: () => (
     <PageSkeleton>
       <TableSkeleton rows={8} cols={6} />

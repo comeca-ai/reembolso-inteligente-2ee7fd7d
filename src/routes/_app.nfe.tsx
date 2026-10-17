@@ -148,7 +148,7 @@ async function fetchNfe(): Promise<NfeRow[]> {
 }
 
 export const Route = createFileRoute("/_app/nfe")({
-  head: () => ({ meta: [{ title: "NF-e · reembolso.ia.br" }] }),
+  head: () => ({ meta: [{ title: "NF-e · reembolsa aí" }, { name: "description", content: "Verificação fiscal e compliance de notas fiscais corporativas." }, { property: "og:title", content: "NF-e · reembolsa aí" }, { property: "og:description", content: "Verificação fiscal e compliance de notas fiscais corporativas." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   pendingComponent: () => (
     <PageSkeleton>
       <TableSkeleton rows={8} cols={5} />

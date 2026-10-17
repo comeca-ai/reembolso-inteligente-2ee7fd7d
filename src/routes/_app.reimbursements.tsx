@@ -44,7 +44,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_app/reimbursements")({
-  head: () => ({ meta: [{ title: "Reembolsos recebidos · reembolso.ia.br" }] }),
+  head: () => ({ meta: [{ title: "Reembolsos recebidos · reembolsa aí" }, { name: "description", content: "Acompanhe comprovantes recebidos e decisões de reembolso." }, { property: "og:title", content: "Reembolsos recebidos · reembolsa aí" }, { property: "og:description", content: "Acompanhe comprovantes recebidos e decisões de reembolso." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   beforeLoad: () => {
     const role = getCurrentUser()?.role;
     if (!canAccess("/reimbursements", role)) {

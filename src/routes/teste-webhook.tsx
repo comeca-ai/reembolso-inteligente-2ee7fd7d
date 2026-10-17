@@ -21,12 +21,7 @@ export const Route = createFileRoute("/teste-webhook")({
       throw redirect({ to: landingForRole(role) });
     }
   },
-  head: () => ({
-    meta: [
-      { title: "Teste do Webhook — reembolso.ia.br" },
-      { name: "description", content: "Página de teste do webhook de reembolsos" },
-    ],
-  }),
+  head: () => ({ meta: [{ title: "Teste de recebimento · reembolsa aí" }, { name: "description", content: "Verificação administrativa do recebimento de comprovantes." }, { property: "og:title", content: "Teste de recebimento · reembolsa aí" }, { property: "og:description", content: "Verificação administrativa do recebimento de comprovantes." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: TesteWebhookPage,
 });
 
