@@ -9,59 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TesteWebhookRouteImport } from './routes/teste-webhook'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as PreCadastroRouteImport } from './routes/pre-cadastro'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppUsersRouteImport } from './routes/_app.users'
-import { Route as AppReportsRouteImport } from './routes/_app.reports'
-import { Route as AppReimbursementsRouteImport } from './routes/_app.reimbursements'
-import { Route as AppPolicyRouteImport } from './routes/_app.policy'
-import { Route as AppOverviewRouteImport } from './routes/_app.overview'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PreCadastroRouteImport } from './routes/pre-cadastro'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TesteWebhookRouteImport } from './routes/teste-webhook'
 import { Route as AppNfeRouteImport } from './routes/_app.nfe'
+import { Route as AppOverviewRouteImport } from './routes/_app.overview'
+import { Route as AppPolicyRouteImport } from './routes/_app.policy'
+import { Route as AppReimbursementsRouteImport } from './routes/_app.reimbursements'
+import { Route as AppReportsRouteImport } from './routes/_app.reports'
+import { Route as AppUsersRouteImport } from './routes/_app.users'
 import { Route as AppExpensesIndexRouteImport } from './routes/_app.expenses.index'
-import { Route as ApiPublicReimbursementsRouteImport } from './routes/api/public/reimbursements'
-import { Route as ApiPublicEvolutionRouteImport } from './routes/api/public/evolution'
-import { Route as ApiPublicDespesasRouteImport } from './routes/api/public/despesas'
 import { Route as AppExpensesIdRouteImport } from './routes/_app.expenses.$id'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
-import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicDespesasRouteImport } from './routes/api/public/despesas'
+import { Route as ApiPublicEvolutionRouteImport } from './routes/api/public/evolution'
+import { Route as ApiPublicReimbursementsRouteImport } from './routes/api/public/reimbursements'
 import { Route as ApiPublicHooksHealthCheckRouteImport } from './routes/api/public/hooks/health-check'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
-const TesteWebhookRoute = TesteWebhookRouteImport.update({
-  id: '/teste-webhook',
-  path: '/teste-webhook',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PreCadastroRoute = PreCadastroRouteImport.update({
-  id: '/pre-cadastro',
-  path: '/pre-cadastro',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -69,33 +48,39 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppRoute = AppRouteImport.update({
-  id: '/_app',
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const PreCadastroRoute = PreCadastroRouteImport.update({
+  id: '/pre-cadastro',
+  path: '/pre-cadastro',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppUsersRoute = AppUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AppRoute,
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppReportsRoute = AppReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => AppRoute,
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppReimbursementsRoute = AppReimbursementsRouteImport.update({
-  id: '/reimbursements',
-  path: '/reimbursements',
-  getParentRoute: () => AppRoute,
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppPolicyRoute = AppPolicyRouteImport.update({
-  id: '/policy',
-  path: '/policy',
+const TesteWebhookRoute = TesteWebhookRouteImport.update({
+  id: '/teste-webhook',
+  path: '/teste-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppNfeRoute = AppNfeRouteImport.update({
+  id: '/nfe',
+  path: '/nfe',
   getParentRoute: () => AppRoute,
 } as any)
 const AppOverviewRoute = AppOverviewRouteImport.update({
@@ -103,9 +88,24 @@ const AppOverviewRoute = AppOverviewRouteImport.update({
   path: '/overview',
   getParentRoute: () => AppRoute,
 } as any)
-const AppNfeRoute = AppNfeRouteImport.update({
-  id: '/nfe',
-  path: '/nfe',
+const AppPolicyRoute = AppPolicyRouteImport.update({
+  id: '/policy',
+  path: '/policy',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReimbursementsRoute = AppReimbursementsRouteImport.update({
+  id: '/reimbursements',
+  path: '/reimbursements',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUsersRoute = AppUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => AppRoute,
 } as any)
 const AppExpensesIndexRoute = AppExpensesIndexRouteImport.update({
@@ -113,9 +113,14 @@ const AppExpensesIndexRoute = AppExpensesIndexRouteImport.update({
   path: '/expenses/',
   getParentRoute: () => AppRoute,
 } as any)
-const ApiPublicReimbursementsRoute = ApiPublicReimbursementsRouteImport.update({
-  id: '/api/public/reimbursements',
-  path: '/api/public/reimbursements',
+const AppExpensesIdRoute = AppExpensesIdRouteImport.update({
+  id: '/expenses/$id',
+  path: '/expenses/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const ApiPublicDespesasRoute = ApiPublicDespesasRouteImport.update({
+  id: '/api/public/despesas',
+  path: '/api/public/despesas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicEvolutionRoute = ApiPublicEvolutionRouteImport.update({
@@ -123,36 +128,31 @@ const ApiPublicEvolutionRoute = ApiPublicEvolutionRouteImport.update({
   path: '/api/public/evolution',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicDespesasRoute = ApiPublicDespesasRouteImport.update({
-  id: '/api/public/despesas',
-  path: '/api/public/despesas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppExpensesIdRoute = AppExpensesIdRouteImport.update({
-  id: '/expenses/$id',
-  path: '/expenses/$id',
-  getParentRoute: () => AppRoute,
-} as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
-  id: '/lovable/email/auth/webhook',
-  path: '/lovable/email/auth/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
-  id: '/lovable/email/auth/preview',
-  path: '/lovable/email/auth/preview',
+const ApiPublicReimbursementsRoute = ApiPublicReimbursementsRouteImport.update({
+  id: '/api/public/reimbursements',
+  path: '/api/public/reimbursements',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHooksHealthCheckRoute =
   ApiPublicHooksHealthCheckRouteImport.update({
     id: '/api/public/hooks/health-check',
     path: '/api/public/hooks/health-check',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -333,53 +333,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/teste-webhook': {
-      id: '/teste-webhook'
-      path: '/teste-webhook'
-      fullPath: '/teste-webhook'
-      preLoaderRoute: typeof TesteWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pre-cadastro': {
-      id: '/pre-cadastro'
-      path: '/pre-cadastro'
-      fullPath: '/pre-cadastro'
-      preLoaderRoute: typeof PreCadastroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
@@ -389,39 +347,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/users': {
-      id: '/_app/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof AppUsersRouteImport
-      parentRoute: typeof AppRoute
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/reports': {
-      id: '/_app/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof AppReportsRouteImport
-      parentRoute: typeof AppRoute
+    '/pre-cadastro': {
+      id: '/pre-cadastro'
+      path: '/pre-cadastro'
+      fullPath: '/pre-cadastro'
+      preLoaderRoute: typeof PreCadastroRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/reimbursements': {
-      id: '/_app/reimbursements'
-      path: '/reimbursements'
-      fullPath: '/reimbursements'
-      preLoaderRoute: typeof AppReimbursementsRouteImport
-      parentRoute: typeof AppRoute
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/policy': {
-      id: '/_app/policy'
-      path: '/policy'
-      fullPath: '/policy'
-      preLoaderRoute: typeof AppPolicyRouteImport
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teste-webhook': {
+      id: '/teste-webhook'
+      path: '/teste-webhook'
+      fullPath: '/teste-webhook'
+      preLoaderRoute: typeof TesteWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/nfe': {
+      id: '/_app/nfe'
+      path: '/nfe'
+      fullPath: '/nfe'
+      preLoaderRoute: typeof AppNfeRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/overview': {
@@ -431,11 +410,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOverviewRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/nfe': {
-      id: '/_app/nfe'
-      path: '/nfe'
-      fullPath: '/nfe'
-      preLoaderRoute: typeof AppNfeRouteImport
+    '/_app/policy': {
+      id: '/_app/policy'
+      path: '/policy'
+      fullPath: '/policy'
+      preLoaderRoute: typeof AppPolicyRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reimbursements': {
+      id: '/_app/reimbursements'
+      path: '/reimbursements'
+      fullPath: '/reimbursements'
+      preLoaderRoute: typeof AppReimbursementsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/reports': {
+      id: '/_app/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/users': {
+      id: '/_app/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AppUsersRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/expenses/': {
@@ -445,11 +445,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppExpensesIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/api/public/reimbursements': {
-      id: '/api/public/reimbursements'
-      path: '/api/public/reimbursements'
-      fullPath: '/api/public/reimbursements'
-      preLoaderRoute: typeof ApiPublicReimbursementsRouteImport
+    '/_app/expenses/$id': {
+      id: '/_app/expenses/$id'
+      path: '/expenses/$id'
+      fullPath: '/expenses/$id'
+      preLoaderRoute: typeof AppExpensesIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/api/public/despesas': {
+      id: '/api/public/despesas'
+      path: '/api/public/despesas'
+      fullPath: '/api/public/despesas'
+      preLoaderRoute: typeof ApiPublicDespesasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/evolution': {
@@ -459,32 +466,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicEvolutionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/despesas': {
-      id: '/api/public/despesas'
-      path: '/api/public/despesas'
-      fullPath: '/api/public/despesas'
-      preLoaderRoute: typeof ApiPublicDespesasRouteImport
+    '/api/public/reimbursements': {
+      id: '/api/public/reimbursements'
+      path: '/api/public/reimbursements'
+      fullPath: '/api/public/reimbursements'
+      preLoaderRoute: typeof ApiPublicReimbursementsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/expenses/$id': {
-      id: '/_app/expenses/$id'
-      path: '/expenses/$id'
-      fullPath: '/expenses/$id'
-      preLoaderRoute: typeof AppExpensesIdRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/auth/webhook': {
-      id: '/lovable/email/auth/webhook'
-      path: '/lovable/email/auth/webhook'
-      fullPath: '/lovable/email/auth/webhook'
-      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+    '/api/public/hooks/health-check': {
+      id: '/api/public/hooks/health-check'
+      path: '/api/public/hooks/health-check'
+      fullPath: '/api/public/hooks/health-check'
+      preLoaderRoute: typeof ApiPublicHooksHealthCheckRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/auth/preview': {
@@ -494,11 +487,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/health-check': {
-      id: '/api/public/hooks/health-check'
-      path: '/api/public/hooks/health-check'
-      fullPath: '/api/public/hooks/health-check'
-      preLoaderRoute: typeof ApiPublicHooksHealthCheckRouteImport
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
