@@ -207,6 +207,17 @@
   animation: fade-rise 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.enterprise-home h1,
+.enterprise-home h2,
+.enterprise-home h3 {
+  letter-spacing: 0;
+}
+
+.enterprise-home section[id],
+.enterprise-home div[id] {
+  scroll-margin-top: 6rem;
+}
+
 @keyframes shimmer {
   100% {
     transform: translateX(100%);

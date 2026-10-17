@@ -98,8 +98,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         name: "twitter:description",
         content: "Automatize os reembolsos da sua equipe de campo com IA explicável.",
       },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/dac6b145-d7fc-4ce8-acfb-e850d3db3065/id-preview-f7691a37--95e4f1ba-e730-46d6-951e-3c12435fb6b9.lovable.app-1780641237602.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/dac6b145-d7fc-4ce8-acfb-e850d3db3065/id-preview-f7691a37--95e4f1ba-e730-46d6-951e-3c12435fb6b9.lovable.app-1780641237602.png" },
     ],
     links: [
       { rel: "icon", type: "image/png", href: faviconAsset.url },
@@ -124,7 +122,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
