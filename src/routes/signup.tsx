@@ -14,16 +14,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Eye, EyeOff, Check, X, Circle, Upload, FileSpreadsheet } from "lucide-react";
+import { Loader2, Eye, EyeOff, Check, X, Circle, Upload, FileSpreadsheet, UploadCloud, FileText, CheckCircle2 } from "lucide-react";
 import {
   signUpCompany,
   isAuthenticated,
+  getCurrentUser,
+  markPolicyUploaded,
   SIGN_UP_STEPS,
   SIGN_UP_STEP_LABELS,
   SignUpStepError,
   type SignUpStep,
 } from "@/lib/auth";
 import { inviteParticipantsBatch } from "@/lib/participants-invite.functions";
+import { api } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { parseParticipantsCsv, type ParsedParticipantRow } from "@/lib/participants-csv";
 
 export const Route = createFileRoute("/signup")({
@@ -72,7 +76,7 @@ type Errors = Partial<Record<keyof FormState, string>>;
 
 function SignupPage() {
   const navigate = useNavigate();
-  const [phase, setPhase] = useState<"form" | "participants">("form");
+  const [phase, setPhase] = useState<"form" | "politica" | "participants">("form");
   const [form, setForm] = useState<FormState>({
     razaoSocial: "",
     cnpj: "",
@@ -151,9 +155,9 @@ function SignupPage() {
 
       setProgressOpen(false);
       toast.success("Conta criada!", {
-        description: `${form.razaoSocial} está pronta. Agora envie sua política de reembolso para concluir o setup.`,
+        description: `${form.razaoSocial} está pronta. Agora envie a política de reembolso da empresa — primeiro passo do setup.`,
       });
-      setPhase("participants");
+      setPhase("politica");
     } catch (err) {
       const message = (err as { message?: string })?.message ?? "";
       let description = "Tente novamente em instantes.";
@@ -180,6 +184,21 @@ function SignupPage() {
   }
 
 
+  if (phase === "politica") {
+    return (
+      <AuthLayout
+        eyebrow="Configurar a solução"
+        title="Envie a política da empresa"
+        subtitle="Primeiro passo do setup: a IA lê a sua política de reembolso para avaliar cada despesa automaticamente."
+      >
+        <PoliticaStep
+          onFinish={() => setPhase("participants")}
+          onSkip={() => setPhase("participants")}
+        />
+      </AuthLayout>
+    );
+  }
+
   if (phase === "participants") {
     return (
       <AuthLayout
@@ -187,7 +206,7 @@ function SignupPage() {
         title="Participantes da equipe"
         subtitle="Suba uma planilha (CSV) com quem vai participar. Cada pessoa recebe acesso e o convite por e-mail."
       >
-        <ParticipantsStep onFinish={() => navigate({ to: "/onboarding" })} />
+        <ParticipantsStep onFinish={() => navigate({ to: "/overview" })} />
       </AuthLayout>
     );
   }
@@ -416,6 +435,136 @@ function SignupProgressDialog({
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+const POLICY_MAX_MB = 10;
+const POLICY_ACCEPT = [".pdf", ".doc", ".docx"];
+
+function PoliticaStep({ onFinish, onSkip }: { onFinish: () => void; onSkip: () => void }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [erro, setErro] = useState<string | undefined>();
+  const [dragging, setDragging] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+
+  function validar(f: File): string | undefined {
+    const ok = POLICY_ACCEPT.some((ext) => f.name.toLowerCase().endsWith(ext));
+    if (!ok) return "Formato inválido. Envie um PDF, DOC ou DOCX.";
+    if (f.size > POLICY_MAX_MB * 1024 * 1024) return `Arquivo acima de ${POLICY_MAX_MB} MB.`;
+    return undefined;
+  }
+
+  function selecionar(f: File | null) {
+    if (!f) return;
+    const e = validar(f);
+    setErro(e);
+    setFile(e ? null : f);
+  }
+
+  async function concluir() {
+    if (!file) return;
+    setEnviando(true);
+    try {
+      await api.uploadPolicy(file.name, getCurrentUser()?.nome ?? "Admin");
+      await markPolicyUploaded(file.name);
+      toast.success("Política ativada", {
+        description: "A IA já pode avaliar despesas com base nas suas regras.",
+      });
+      onFinish();
+    } catch {
+      setEnviando(false);
+      toast.error("Não foi possível enviar agora. Tente novamente.");
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <input
+        ref={inputRef}
+        type="file"
+        accept={POLICY_ACCEPT.join(",")}
+        className="hidden"
+        onChange={(e) => selecionar(e.target.files?.[0] ?? null)}
+      />
+
+      {!file ? (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragging(false);
+            selecionar(e.dataTransfer.files?.[0] ?? null);
+          }}
+          className={cn(
+            "flex w-full flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors",
+            dragging
+              ? "border-brand bg-brand/5"
+              : "border-border bg-secondary/30 hover:bg-secondary/50",
+          )}
+        >
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand/10">
+            <UploadCloud className="h-6 w-6 text-brand" />
+          </div>
+          <p className="mt-3 text-sm font-medium text-foreground">
+            Arraste o arquivo ou clique para selecionar
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            PDF, DOC ou DOCX · até {POLICY_MAX_MB} MB
+          </p>
+        </button>
+      ) : (
+        <div className="flex items-center gap-3 rounded-xl border border-brand/30 bg-brand/5 p-4">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand/15">
+            <FileText className="h-5 w-5 text-brand" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
+            <p className="text-xs text-muted-foreground">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setFile(null);
+              if (inputRef.current) inputRef.current.value = "";
+            }}
+            className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-destructive"
+            aria-label="Remover arquivo"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      {erro && <p className="text-sm text-destructive">{erro}</p>}
+
+      <Button onClick={concluir} disabled={!file || enviando} className="w-full gap-2" size="lg">
+        {enviando ? (
+          "Ativando política…"
+        ) : (
+          <>
+            <CheckCircle2 className="h-4 w-4" />
+            Ativar política e continuar
+          </>
+        )}
+      </Button>
+      <button
+        type="button"
+        onClick={onSkip}
+        className="w-full text-center text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+      >
+        Enviar depois — continuar sem política
+      </button>
+      <p className="text-center text-xs text-muted-foreground">
+        Sem a política, a análise automática fica desativada até você enviá-la na tela de Política.
+      </p>
+    </div>
   );
 }
 
