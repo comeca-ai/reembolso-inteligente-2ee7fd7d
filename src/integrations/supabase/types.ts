@@ -59,6 +59,32 @@ export type Database = {
         }
         Relationships: []
       }
+      company_setup_progress: {
+        Row: {
+          company_id: string
+          step: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          step?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          step?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_setup_progress_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       despesas: {
         Row: {
           created_at: string
