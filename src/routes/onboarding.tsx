@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { isAuthenticated, getCurrentUser } from '@/lib/auth';
 import { landingForRole } from '@/lib/permissions';
 import { getSetupProgress, saveSetupProgress } from '@/lib/setup.functions';
+import { nextSetupStep } from '@/lib/setup';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { PolicyUploadStep } from '@/components/policy/PolicyUploadStep';
 import { ParticipantsStep } from '@/components/auth/ParticipantsStep';
@@ -25,7 +26,9 @@ function OnboardingPage() {
   const read = useServerFn(getSetupProgress);
   const save = useServerFn(saveSetupProgress);
   const query = useQuery({ queryKey: ['company-setup', getCurrentUser()?.company.id], queryFn: () => read() });
-  async function advance(step: 'participants' | 'completed') {
+  async function advance() {
+    if (!query.data) throw new Error('Configuração ainda não carregada.');
+    const step = nextSetupStep(query.data.step);
     await save({ data: { step } });
     await query.refetch();
     if (step === 'completed') await navigate({ to: landingForRole(getCurrentUser()?.role) });
@@ -33,7 +36,7 @@ function OnboardingPage() {
   const step = query.data?.step;
   return <AuthLayout eyebrow="Configurar a solução" title={step === 'participants' ? 'Participantes da empresa' : step === 'completed' ? 'Configuração concluída' : 'Política da empresa'} subtitle={getCurrentUser()?.company.razao_social ?? 'Configuração corporativa'}>
     <ol aria-label="Etapas da configuração" className="mb-6 flex flex-wrap gap-4 text-xs text-muted-foreground"><li>1. Empresa e conta</li><li className={step === 'policy' ? 'font-semibold text-brand' : ''} aria-current={step === 'policy' ? 'step' : undefined}>2. Política</li><li className={step === 'participants' ? 'font-semibold text-brand' : ''} aria-current={step === 'participants' ? 'step' : undefined}>3. Participantes</li></ol>
-    {query.isPending ? <p role="status" className="text-sm text-muted-foreground">Carregando configuração…</p> : query.isError ? <div><p role="alert" className="mb-3 text-sm text-destructive">Não foi possível carregar a configuração.</p><Button onClick={() => void query.refetch()}>Tentar novamente</Button></div> : step === 'policy' ? <PolicyUploadStep onFinish={() => advance('participants')} /> : step === 'participants' ? <ParticipantsStep onFinish={() => { void advance('completed').catch(() => toast.error('Não foi possível concluir. Tente novamente.')); }} /> : <Button className="w-full" onClick={() => navigate({ to: landingForRole(getCurrentUser()?.role) })}>Entrar na aplicação</Button>}
+    {query.isPending ? <p role="status" className="text-sm text-muted-foreground">Carregando configuração…</p> : query.isError ? <div><p role="alert" className="mb-3 text-sm text-destructive">Não foi possível carregar a configuração.</p><Button onClick={() => void query.refetch()}>Tentar novamente</Button></div> : step === 'policy' ? <PolicyUploadStep onFinish={advance} /> : step === 'participants' ? <ParticipantsStep onFinish={() => { void advance().catch(() => toast.error('Não foi possível concluir. Tente novamente.')); }} /> : <Button className="w-full" onClick={() => navigate({ to: landingForRole(getCurrentUser()?.role) })}>Entrar na aplicação</Button>}
     <Button variant="link" className="mt-4 w-full" onClick={() => navigate({ to: landingForRole(getCurrentUser()?.role) })}>Continuar na aplicação</Button>
   </AuthLayout>;
 }
