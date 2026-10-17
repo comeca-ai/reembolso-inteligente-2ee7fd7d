@@ -1,6 +1,5 @@
-import { useRef, useState } from "react";
+import { useId, useState } from "react";
 import { createFileRoute, redirect, Link, useNavigate } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
@@ -18,23 +17,18 @@ import { Loader2, Eye, EyeOff, Check, X, Circle, Upload, FileSpreadsheet, Upload
 import {
   signUpCompany,
   isAuthenticated,
-  getCurrentUser,
-  markPolicyUploaded,
   SIGN_UP_STEPS,
   SIGN_UP_STEP_LABELS,
   SignUpStepError,
   type SignUpStep,
 } from "@/lib/auth";
-import { inviteParticipantsBatch } from "@/lib/participants-invite.functions";
-import { api } from "@/lib/api";
-import { cn } from "@/lib/utils";
-import { parseParticipantsCsv, type ParsedParticipantRow } from "@/lib/participants-csv";
 
 export const Route = createFileRoute("/signup")({
   ssr: false,
+  head: () => ({ meta: [{ title: "Configurar empresa · reembolsa aí" }, { name: "description", content: "Cadastre sua empresa e configure política e participantes no reembolsa aí." }, { property: "og:title", content: "Configurar empresa · reembolsa aí" }, { property: "og:description", content: "Configure sua operação de reembolso corporativo." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   beforeLoad: async () => {
     if (await isAuthenticated()) {
-      throw redirect({ to: "/overview" });
+      throw redirect({ to: "/onboarding" });
     }
   },
   component: SignupPage,
@@ -76,7 +70,6 @@ type Errors = Partial<Record<keyof FormState, string>>;
 
 function SignupPage() {
   const navigate = useNavigate();
-  const [phase, setPhase] = useState<"form" | "politica" | "participants">("form");
   const [form, setForm] = useState<FormState>({
     razaoSocial: "",
     cnpj: "",
@@ -157,7 +150,7 @@ function SignupPage() {
       toast.success("Conta criada!", {
         description: `${form.razaoSocial} está pronta. Agora envie a política de reembolso da empresa — primeiro passo do setup.`,
       });
-      setPhase("politica");
+      navigate({ to: "/onboarding" });
     } catch (err) {
       const message = (err as { message?: string })?.message ?? "";
       let description = "Tente novamente em instantes.";
@@ -184,32 +177,6 @@ function SignupPage() {
   }
 
 
-  if (phase === "politica") {
-    return (
-      <AuthLayout
-        eyebrow="Configurar a solução"
-        title="Envie a política da empresa"
-        subtitle="Primeiro passo do setup: a IA lê a sua política de reembolso para avaliar cada despesa automaticamente."
-      >
-        <PoliticaStep
-          onFinish={() => setPhase("participants")}
-          onSkip={() => setPhase("participants")}
-        />
-      </AuthLayout>
-    );
-  }
-
-  if (phase === "participants") {
-    return (
-      <AuthLayout
-        eyebrow="Configurar a solução"
-        title="Participantes da equipe"
-        subtitle="Suba uma planilha (CSV) com quem vai participar. Cada pessoa recebe acesso e o convite por e-mail."
-      >
-        <ParticipantsStep onFinish={() => navigate({ to: "/overview" })} />
-      </AuthLayout>
-    );
-  }
 
   return (
     <AuthLayout
@@ -218,7 +185,9 @@ function SignupPage() {
       subtitle="Cadastre sua empresa e o primeiro administrador para começar o setup."
     >
 
+      <ol className="mb-5 flex flex-wrap gap-4 text-xs text-muted-foreground" aria-label="Etapas da configuração"><li className="font-semibold text-brand" aria-current="step">1. Empresa e conta</li><li>2. Política</li><li>3. Participantes</li></ol>
       <form onSubmit={handleSubmit} className="space-y-3" noValidate>
+        <h2 className="text-sm font-semibold text-foreground">Dados da empresa</h2>
         <Field label="Razão social" error={errors.razaoSocial}>
           <Input
             placeholder="Sua Empresa Ltda."
@@ -238,6 +207,7 @@ function SignupPage() {
           />
         </Field>
 
+        <h2 className="pt-3 text-sm font-semibold text-foreground">Administrador</h2>
         <Field label="Nome do responsável" error={errors.nomeResponsavel}>
           <Input
             placeholder="Maria Silva"
@@ -438,298 +408,7 @@ function SignupProgressDialog({
   );
 }
 
-const POLICY_MAX_MB = 10;
-const POLICY_ACCEPT = [".pdf", ".doc", ".docx"];
 
-function PoliticaStep({ onFinish, onSkip }: { onFinish: () => void; onSkip: () => void }) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [erro, setErro] = useState<string | undefined>();
-  const [dragging, setDragging] = useState(false);
-  const [enviando, setEnviando] = useState(false);
-
-  function validar(f: File): string | undefined {
-    const ok = POLICY_ACCEPT.some((ext) => f.name.toLowerCase().endsWith(ext));
-    if (!ok) return "Formato inválido. Envie um PDF, DOC ou DOCX.";
-    if (f.size > POLICY_MAX_MB * 1024 * 1024) return `Arquivo acima de ${POLICY_MAX_MB} MB.`;
-    return undefined;
-  }
-
-  function selecionar(f: File | null) {
-    if (!f) return;
-    const e = validar(f);
-    setErro(e);
-    setFile(e ? null : f);
-  }
-
-  async function concluir() {
-    if (!file) return;
-    setEnviando(true);
-    try {
-      await api.uploadPolicy(file.name, getCurrentUser()?.nome ?? "Admin");
-      await markPolicyUploaded(file.name);
-      toast.success("Política ativada", {
-        description: "A IA já pode avaliar despesas com base nas suas regras.",
-      });
-      onFinish();
-    } catch {
-      setEnviando(false);
-      toast.error("Não foi possível enviar agora. Tente novamente.");
-    }
-  }
-
-  return (
-    <div className="space-y-4">
-      <input
-        ref={inputRef}
-        type="file"
-        accept={POLICY_ACCEPT.join(",")}
-        className="hidden"
-        onChange={(e) => selecionar(e.target.files?.[0] ?? null)}
-      />
-
-      {!file ? (
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragging(true);
-          }}
-          onDragLeave={() => setDragging(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setDragging(false);
-            selecionar(e.dataTransfer.files?.[0] ?? null);
-          }}
-          className={cn(
-            "flex w-full flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors",
-            dragging
-              ? "border-brand bg-brand/5"
-              : "border-border bg-secondary/30 hover:bg-secondary/50",
-          )}
-        >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand/10">
-            <UploadCloud className="h-6 w-6 text-brand" />
-          </div>
-          <p className="mt-3 text-sm font-medium text-foreground">
-            Arraste o arquivo ou clique para selecionar
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            PDF, DOC ou DOCX · até {POLICY_MAX_MB} MB
-          </p>
-        </button>
-      ) : (
-        <div className="flex items-center gap-3 rounded-xl border border-brand/30 bg-brand/5 p-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-brand/15">
-            <FileText className="h-5 w-5 text-brand" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
-            <p className="text-xs text-muted-foreground">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setFile(null);
-              if (inputRef.current) inputRef.current.value = "";
-            }}
-            className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-destructive"
-            aria-label="Remover arquivo"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      )}
-
-      {erro && <p className="text-sm text-destructive">{erro}</p>}
-
-      <Button onClick={concluir} disabled={!file || enviando} className="w-full gap-2" size="lg">
-        {enviando ? (
-          "Ativando política…"
-        ) : (
-          <>
-            <CheckCircle2 className="h-4 w-4" />
-            Ativar política e continuar
-          </>
-        )}
-      </Button>
-      <button
-        type="button"
-        onClick={onSkip}
-        className="w-full text-center text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-      >
-        Enviar depois — continuar sem política
-      </button>
-      <p className="text-center text-xs text-muted-foreground">
-        Sem a política, a análise automática fica desativada até você enviá-la na tela de Política.
-      </p>
-    </div>
-  );
-}
-
-const ROLE_LABELS: Record<ParsedParticipantRow["role"], string> = {
-  admin: "Administrador",
-  approver: "Aprovador",
-  member: "Colaborador",
-};
-
-function ParticipantsStep({ onFinish }: { onFinish: () => void }) {
-  const inviteBatch = useServerFn(inviteParticipantsBatch);
-  const fileRef = useRef<HTMLInputElement>(null);
-  const [fileName, setFileName] = useState<string>("");
-  const [rows, setRows] = useState<ParsedParticipantRow[]>([]);
-  const [parseError, setParseError] = useState<string>("");
-  const [sending, setSending] = useState(false);
-  const [done, setDone] = useState(false);
-
-  const validRows = rows.filter((r) => !r.error);
-  const invalidRows = rows.filter((r) => r.error);
-
-  async function handleFile(file: File) {
-    setParseError("");
-    setDone(false);
-    setFileName(file.name);
-    const text = await file.text();
-    const { rows: parsed, error } = parseParticipantsCsv(text);
-    if (error) {
-      setParseError(error);
-      setRows([]);
-      return;
-    }
-    if (parsed.length === 0) {
-      setParseError("Nenhum participante encontrado na planilha.");
-      setRows([]);
-      return;
-    }
-    setRows(parsed);
-  }
-
-  async function handleSend() {
-    if (validRows.length === 0) return;
-    setSending(true);
-    try {
-      const out = await inviteBatch({
-        data: {
-          origin: window.location.origin,
-          participants: validRows.map((r) => ({
-            nome: r.nome,
-            email: r.email,
-            whatsapp: r.whatsapp,
-            role: r.role,
-          })),
-        },
-      });
-      const failed = out.total - out.succeeded;
-      if (out.succeeded > 0) {
-        toast.success(`${out.succeeded} convite(s) enviado(s)`, {
-          description: failed > 0 ? `${failed} não puderam ser enviados.` : "Todos receberão o e-mail de acesso.",
-        });
-      }
-      if (failed > 0 && out.succeeded === 0) {
-        toast.error("Nenhum convite pôde ser enviado", {
-          description: "Verifique os e-mails da planilha e tente novamente.",
-        });
-      }
-      setDone(true);
-    } catch (err) {
-      const message = (err as { message?: string })?.message ?? "Tente novamente.";
-      toast.error("Falha ao enviar convites", { description: message });
-    } finally {
-      setSending(false);
-    }
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="rounded-md border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
-        <p className="font-medium text-foreground">Formato da planilha (CSV)</p>
-        <p className="mt-1">
-          Colunas: <strong>Nome</strong>, <strong>E-mail</strong>, <strong>WhatsApp</strong> e{" "}
-          <strong>Cargo/Função</strong> (admin, aprovador ou colaborador).
-        </p>
-      </div>
-
-      <input
-        ref={fileRef}
-        type="file"
-        accept=".csv,text/csv"
-        className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) void handleFile(file);
-          e.target.value = "";
-        }}
-      />
-
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full"
-        onClick={() => fileRef.current?.click()}
-        disabled={sending}
-      >
-        <Upload className="h-4 w-4" />
-        {fileName ? "Trocar planilha" : "Selecionar planilha CSV"}
-      </Button>
-
-      {fileName && (
-        <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <FileSpreadsheet className="h-4 w-4" /> {fileName}
-        </p>
-      )}
-
-      {parseError && <p className="text-sm text-destructive">{parseError}</p>}
-
-      {rows.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">
-            {validRows.length} válido(s)
-            {invalidRows.length > 0 && ` · ${invalidRows.length} com problema`}
-          </p>
-          <div className="max-h-64 overflow-auto rounded-md border border-border">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2 font-medium">Nome</th>
-                  <th className="px-3 py-2 font-medium">E-mail</th>
-                  <th className="px-3 py-2 font-medium">Papel</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r.line} className="border-t border-border">
-                    <td className="px-3 py-2">{r.nome || "—"}</td>
-                    <td className="px-3 py-2">
-                      {r.email || "—"}
-                      {r.error && <span className="block text-xs text-destructive">{r.error}</span>}
-                    </td>
-                    <td className="px-3 py-2">{ROLE_LABELS[r.role]}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      <div className="flex gap-2 pt-2">
-        <Button
-          type="button"
-          className="flex-1"
-          onClick={handleSend}
-          disabled={sending || validRows.length === 0 || done}
-        >
-          {sending && <Loader2 className="h-4 w-4 animate-spin" />}
-          {done ? "Convites enviados" : `Enviar ${validRows.length || ""} convite(s)`}
-        </Button>
-        <Button type="button" variant="ghost" onClick={onFinish} disabled={sending}>
-          {done ? "Ir ao painel" : "Pular"}
-        </Button>
-      </div>
-    </div>
-  );
-}
 
 
 
@@ -743,10 +422,11 @@ function Field({
   error?: string;
   children: React.ReactNode;
 }) {
+  const id = useId();
   return (
     <div className="space-y-1.5">
-      <Label>{label}</Label>
-      {children}
+      <Label htmlFor={id}>{label}</Label>
+      <div id={id}>{children}</div>
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
