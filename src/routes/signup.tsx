@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { cloneElement, isValidElement, useId, useState } from "react";
 import { createFileRoute, redirect, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Eye, EyeOff, Check, X, Circle, Upload, FileSpreadsheet, UploadCloud, FileText, CheckCircle2 } from "lucide-react";
+import { Loader2, Eye, EyeOff, Check, X, Circle } from "lucide-react";
 import {
   signUpCompany,
   isAuthenticated,
@@ -426,7 +426,11 @@ function Field({
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
-      <div id={id}>{children}</div>
+      {isValidElement<{ id?: string; autoComplete?: string; children?: React.ReactNode }>(children) && children.type === Input
+        ? cloneElement(children, { id, autoComplete: label === "Nome do responsável" ? "name" : label === "E-mail corporativo" ? "email" : label === "WhatsApp" ? "tel" : label.includes("senha") || label === "Senha" ? "new-password" : "organization" })
+        : label === "Senha" && isValidElement<{ children?: React.ReactNode }>(children)
+          ? cloneElement(children, { children: Array.isArray(children.props.children) ? children.props.children.map(child => isValidElement<{ id?: string; autoComplete?: string }>(child) && child.type === Input ? cloneElement(child, { id, autoComplete: "new-password" }) : child) : children.props.children })
+          : children}
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );

@@ -58,7 +58,7 @@ describe("signUpCompany (pré-cadastro)", () => {
     const arg = signUp.mock.calls[0][0];
     expect(arg.email).toBe("maria@empresa.com.br");
     expect(arg.password).toBe(baseInput.senha);
-    expect(arg.options.emailRedirectTo).toBe("https://app.teste/overview");
+    expect(arg.options.emailRedirectTo).toBe("https://app.teste/onboarding");
     expect(arg.options.data.razao_social).toBe("Empresa Teste");
     expect(arg.options.data.nome).toBe("Maria Silva");
   });
