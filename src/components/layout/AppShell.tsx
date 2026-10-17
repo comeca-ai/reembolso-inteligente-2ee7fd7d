@@ -1,4 +1,6 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { PolicyVersionPill } from "@/components/shared/PolicyVersionPill";
+import { api } from "@/lib/api";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { SidebarNav } from "./SidebarNav";
@@ -34,6 +36,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const user = getCurrentUser();
+  const [policy, setPolicy] = useState<{ version: string; since: string } | null | undefined>(undefined);
+  useEffect(() => {
+    api.listPolicyVersions().then((list) => {
+      const a = list.find((p) => p.active);
+      setPolicy(a ? { version: a.version, since: a.uploadedAt ? new Date(a.uploadedAt).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) : "" } : null);
+    }).catch(() => setPolicy(null));
+  }, []);
 
   const userName = user?.nome ?? "Usuário";
   const userEmail = user?.email ?? "";
@@ -85,6 +94,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               )}
             </div>
           </div>
+
+          {policy !== undefined && <PolicyVersionPill version={policy?.version} since={policy?.since} className="hidden sm:inline-flex" />}
 
           <div className="relative ml-auto hidden max-w-md flex-1 md:block lg:ml-6">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
